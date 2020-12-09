@@ -1,34 +1,45 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const date = require( __dirname + "/date.js");
+
 
 const app = express();
 
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
-var items = ["Buy food", "Cook food", "Eat food"];
+let items = ["Buy food", "Cook food", "Eat food"];
+let workItems = [];
 
 app.get("/", (req, res) => {
 
-    var today = new Date();
+    let day = date.getDate();
 
-    var options = {
-        weekday: "long",
-        day: "numeric",
-        month: "long"
-    };
-
-    var day = today.toLocaleDateString("en-US", options);
-
-    res.render ("list", { kindOfDay: day, newListItems: items });
+    res.render ("list", { listTitle: day, newListItems: items });
 
 
 });
 
+app.get("/work", (req, res) => {
+    res.render("list", { listTitle: "Work list", newListItems: workItems})
+});
+
+app.get("/about", (req, res) => {
+    res.render("about");
+});
+
+app.post("/work", (req, res) =>{
+    let item = req.body.newItem;
+    workItems.push(item);
+    res.redirect("/work");
+
+})
+
 app.post("/", (req, res) => {
 
-    var item = req.body.newItem;
+    let item = req.body.newItem;
 
     items.push(item);
 
